@@ -1,0 +1,30 @@
+<h1>All Classes</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Instructor</th>
+      <th>Repeats Every</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @lessons.each do |lesson| %>
+      <tr>
+        <td><%= lesson.title %></td>
+        <td><%= lesson.instructor %></td>
+        <td><%= lesson.schedule_repeat %></td>
+        <td>
+          <%= link_to 'Edit', edit_lesson_path(lesson) %>
+          <%= link_to 'Delete', lesson, method: :delete, data: { confirm: 'Are you sure?' } %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'Add New Class', new_lesson_path %>

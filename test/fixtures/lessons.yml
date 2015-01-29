@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  instructor: MyString
+  schedule_repeat: MyString
+  warm_up: MyText
+  conditioning: MyText
+  events: MyText
+
+two:
+  title: MyString
+  instructor: MyString
+  schedule_repeat: MyString
+  warm_up: MyText
+  conditioning: MyText
+  events: MyText

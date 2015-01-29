@@ -1,0 +1,297 @@
+<%= form_for(@lesson) do |f| %>
+
+  <% if @lesson.errors.any? %>
+    <div id="error_explanation">
+      <h2>%<%= pluralize(@lesson.errors.count, "error") %> prohibited this lesson from being saved:</h2>
+
+      <ul>
+      <% @lesson.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <!--form to add/edit a lesson -->
+    <%
+
+    %>
+
+  <div class="form-controls">
+    <%= f.label :title %><br>
+    <%= f.text_field :title,  'data-validation'=>'required' %>
+  </div>
+  <div class="form-controls">
+     <%= f.label :instructor %><br>
+     <%= f.text_field :instructor, 'data-validation'=>'required' %>
+  </div>
+  <div class="form-controls">
+    <%
+       if(!@lesson.start_time.nil?)
+            start_time = JSON(@lesson.start_time)
+       end
+
+       if(!@lesson.end_time.nil?)
+            end_time = JSON(@lesson.end_time)
+       end
+       week_day = ['mon','tue','wed','thu','fri','sat','sun']
+    %>
+
+    <table>
+        <thead>
+            <th>Class Times</th>
+            <%
+               index = 0
+               week_day.each do |day|
+                    if(!start_time.nil?)
+                        checked= (start_time[index.to_s].to_i > 0)
+                    else
+                        checked = true
+                    end
+                   key = 'chk_schedule['+day+']'
+            %>
+            <th class="week_day"><%=check_box_tag key,1,checked, class:'chk_schedule' %><label><%=  day %></label></th>
+            <%
+               index = index + 1
+               end
+            %>
+        </thead>
+        <tbody>
+            <tr id="start_row">
+                <td>Start</td>
+                <%
+                   index = 0
+                   week_day.each do |day|
+                     if(!start_time.nil?)
+                         hour    = start_time[index.to_s].to_i / 60
+                         minute  = start_time[index.to_s].to_i % 60
+                    else
+                        hour = 9
+                        minute = 0
+                    end
+                 %><td>
+                  <%= time_select 'start_time', day, {:ampm => true, :minute_step=>15, :start_hour=>9, :end_hour =>21, :default => Time.now.change(:hour => hour, :min=> minute)}, 'data-validation'=>'startendtime'%>
+                  </td>
+              <%
+                 index = index + 1
+                 end
+
+                %>
+            </tr>
+            <tr id="end_row">
+              <td>End</td>
+              <%
+                 index = 0
+                 week_day.each do |day|
+                   if(!end_time.nil?)
+                     hour    = end_time[index.to_s].to_i / 60
+                     minute  = end_time[index.to_s].to_i % 60
+                   else
+                     hour = 12
+                     minute = 0
+                   end
+              %><td>
+                  <%= time_select 'end_time', day, {:ampm => true, :minute_step=>15, :start_hour=>9, :end_hour =>21, :default => Time.now.change(:hour => hour, :min=> minute)} , 'data-validation'=>'startendtime'%>
+                  </td>
+              <%
+                 index = index + 1
+                 end
+              %>
+
+            </tr>
+        </tbody>
+    </table>
+  </div>
+    <!--  class scheudle repeater -->
+    <div class="form-controls">
+      <p>
+        <%= f.label :schedule_repeat %>
+        <%= select_tag('schedule_repeat', options_from_collection_for_select(@repeat_interval, :first, :last, @lesson.schedule_repeat)) %>
+
+      </p>
+    </div>
+    <!-- for warmup and conditioner -->
+    <div class="form-controls">
+      <table>
+
+        <tbody>
+        <tr>
+          <td>Warmup</td>
+          <td>
+            <%=
+                if(!@lesson.warm_up.nil? and !@lesson.conditioning.nil?)
+                    warmup = JSON(@lesson.warm_up)
+                    conditioning = JSON(@lesson.conditioning)
+                    def_warmup_equipment = warmup['equipment']
+                    def_warmup_duration = warmup['duration']
+                    def_con_equipment = conditioning['equipment']
+                    def_con_duration = conditioning['duration']
+                else
+                  def_warmup_equipment = :first
+                  def_warmup_duration = :first
+                  def_con_equipment = :first
+                  def_con_duration = :first
+                end
+
+                select_tag "warmup_event",options_from_collection_for_select(@equipments, 'id', 'name', def_warmup_equipment)
+            %>
+          </td>
+          <td>
+            At the beginning of the class for:
+          </td>
+          <td>
+                <%= select_tag 'warmup_duration', options_from_collection_for_select(@durations, :first, :last, def_warmup_duration) %>
+          </td>
+        </tr>
+        <tr>
+          <td>Conditioning</td>
+          <td>
+            <%=
+                select_tag "conditioning_event",options_from_collection_for_select(@equipments, 'id','name', def_con_equipment)
+            %>
+          </td>
+          <td>
+            At the end of the class for:
+          </td>
+          <td>
+            <%= select_tag 'conditioning_duration', options_from_collection_for_select(@durations, :first, :last, def_con_duration) %>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- events -->
+    <div class="form-controls">
+      <table id="events_table">
+        <thead>
+        <th>Event</th>
+         <th>Total Use Each Period(Set Above)</th>
+        <th>Minimum Use Each Class</th>
+        <th>Maximum Use Each Class</th>
+        <th>Action</th>
+        </thead>
+        <tbody>
+            <%
+               if(@lesson.events)
+                    events = JSON(@lesson.events)
+                    total_events = events.length
+               else
+                    total_events = 1
+               end
+
+               #for i in 0...events.length
+               for i in 0..total_events-1
+                if(!events.nil? && !events[i].nil?)
+                    def_equipment       = events[i]['equipment']
+                    def_total_duration  = events[i]['total_use_duration']
+                    def_min_duration    = events[i]['min_use_duration']
+                    def_max_duration    = events[i]['max_use_duration']
+                else
+                  def_equipment       = :first
+                  def_total_duration  = 90
+                  def_min_duration    = 15
+                  def_max_duration    = 45
+                end
+            %>
+
+        <tr class="event_row">
+          <td>
+            <%=  select_tag "events[]",options_from_collection_for_select(@equipments, 'id', 'name', def_equipment) %>
+          </td>
+          <td>
+            <%= select_tag('event_duration[]', options_from_collection_for_select(@durations, :first, :last, def_total_duration)) %>
+          </td>
+          <td>
+            <%= select_tag('event_min_duration[]', options_from_collection_for_select(@durations, :first, :last, def_min_duration)) %>
+          </td>
+          <td>
+            <%= select_tag('event_max_duration[]', options_from_collection_for_select(@durations, :first, :last, def_max_duration)) %>
+          </td>
+          <td><a href="#" class="remove_event">Remove</a></td>
+        </tr>
+            <%
+               end
+            %>
+        <tr>
+          <td colspan="5" >
+            <input type="button" name="add_stipulation" id="add_stipulation" value="Add Stipulation" style="float:right">
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="form-controls">
+        <input type="button" name="create_schedule" id="btn_create_schedule" value="Create Schedule"/>
+      <%= select_tag('schedule_duration', options_from_collection_for_select(@schedule_duration, :first, :last, '2')) %>
+    </div>
+  <div class="actions">
+    <% if(@lesson.persisted?) %>
+         <%= f.submit 'Update Class' %>
+    <% else %>
+       <%= f.submit 'Add Class' %>
+    <% end     %>
+
+  </div>
+<% end %>
+<script>
+    /* important to locate this script AFTER the closing form element, so form object is loaded in DOM before setup is called */
+    // Add validator
+    $.formUtils.addValidator({
+        name : 'startendtime',
+        validatorFunction : function(value, $el, config, language, $form) {
+            //get start, end
+            //
+            if($($el).is(':hidden'))
+                return true;
+
+
+            //parse ids
+            var array = $el.attr('id').split('_');
+
+            //retrive start hour and minute
+            array[0]='start';
+            array[3]='4i';
+
+            var start_hour_id = array.join("_");
+            var start_hour=$('#'+start_hour_id).val();
+
+            array[3]='5i';
+            var start_minute_id = array.join("_");
+            var start_minute = $('#'+start_minute_id).val();
+
+
+            //now end hour and minute
+
+            array[0] = 'end';
+            array[3] = '4i';
+            var end_hour_id = array.join("_");
+            var end_hour = $('#'+end_hour_id).val();
+
+            array[3] = '5i';
+            var end_minute_id = array.join("_");
+            var end_minute = $('#'+end_minute_id).val();
+
+
+        /*    console.log('updated');
+            console.log(start_hour+":"+start_minute);
+            console.log(end_hour +":"+ end_minute);*/
+            if(isNaN(start_minute))
+                start_minute = 0;
+            if(isNaN(end_minute))
+                end_minute = 0 ;
+           /* console.log(start_hour*60+start_minute);
+            console.log(end_hour*60+end_minute);
+            console.log(start_hour*60+start_minute<end_hour*60+end_minute);*/
+            if (eval(start_hour*60+start_minute)<eval(end_hour*60+end_minute))
+                return true;
+            else
+                return false;
+
+        },
+        errorMessage : 'You can\'t take end time before start time',
+        errorMessageKey: 'badTime'
+    });
+
+    $.validate({
+    });
+</script>

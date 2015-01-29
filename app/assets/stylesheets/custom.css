@@ -1,0 +1,25 @@
+#error_explanation {
+    text-align: center;
+}
+#error_explanation h2 {
+    font-size:15px;
+    color: #ff0000;
+}
+a, a:link, a:visited  {
+    text-decoration: none;
+}
+.navbar-header h1 {
+    margin: 26px 0 8px 0;
+    color:#ffffff;
+}
+.terms p {
+    margin: 26px 0 8px 0;
+}
+
+.form-controls {
+    margin-top:20px;
+    margin-bottom:20px;
+}
+th.week_day {
+    text-transform: uppercase;
+}

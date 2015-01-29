@@ -1,0 +1,26 @@
+<h1>All Equipments for User</h1>
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Max Class</th>
+    <th>Description</th>
+    <th>Actions</th>
+  </tr>
+
+  <% @equipments.each do |equipment| %>
+      <tr>
+        <td><%= equipment.name %></td>
+        <td><%= equipment.max_class %></td>
+        <td><%= equipment.desc%></td>
+        <td>
+            <%= link_to 'Edit', edit_equipment_path(equipment) %>
+            <%= link_to 'Delete', equipment,
+                      method: :delete,
+                      data: { confirm: 'Are you sure?' } %>
+        </td>
+      </tr>
+  <% end %>
+</table>
+<p>
+  <%= link_to 'Add New Equipment', new_equipment_path %>
+</p>
