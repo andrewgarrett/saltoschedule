@@ -9,8 +9,8 @@ default: &default
   pool: 5
   timeout: 5000
   host: localhost
-  username: demo
-  password: demo
+  username: postgres
+  password: root
 
 
 development:
@@ -27,3 +27,6 @@ test:
 production:
   <<: *default
   database: db/production
+  username: postgres
+  password: root
+

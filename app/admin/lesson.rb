@@ -2,7 +2,6 @@ ActiveAdmin.register Lesson do
 
 
   permit_params :title, :user_id,  :instructor, :schedule_repeat, :warm_up, :conditioning, :start_time, :end_time, :events
-  #permit_params :title, :instructor, :schedule_repeat, :warm_up, :conditioning, :start_time, :end_time, :events
   filter :user_id, as: :select, collection: User.all.collect{|user| [user.email, user.id]}
   filter :title
   filter :schedule_repeat

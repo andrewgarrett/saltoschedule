@@ -1,6 +1,6 @@
 ActiveAdmin.register Equipment do
 
-  permit_params :name, :max_class, :desc  ,:user_id
+  permit_params :name, :max_class, :desc, :user_id
 
   filter :user_id, as: :select, collection: User.all.collect{|user| [user.email, user.id]}
   filter :name

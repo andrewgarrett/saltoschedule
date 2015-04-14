@@ -29,10 +29,10 @@ ActiveAdmin.register User do
 
   form do |f|
     f.inputs "User Details" do
-      f.input :email
-     f.input :password
-     f.input :password_confirmation
-      f.input :is_active ,:as => :select ,collection: [["Yes", true], ["No", false]]
+    f.input :email
+    f.input :password
+    f.input :password_confirmation
+    f.input :is_active ,:as => :select ,collection: [["Yes", true], ["No", false]]
     end
     f.actions
   end

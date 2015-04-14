@@ -13,7 +13,8 @@
 
  *= require_self
  *= require 'bootstrap'
- *= require 'bootstrap.min'
+ * require 'bootstrap.min'
  *= require 'style'
- *= require_tree .
+ *= require 'custom'
+ * require_tree .
  */

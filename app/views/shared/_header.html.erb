@@ -11,7 +11,7 @@
           <span class="icon-bar"></span>
         </button>
 
-        <a href="#"><h1>Salto Scheduler</h1></a>
+        <a href="#"><h1>SaltoSchedule</h1></a>
 
       </div>
 
@@ -19,7 +19,7 @@
         <ul class="nav navbar-nav  navbar-right">
           <li><%= link_to('Classes', lessons_path) %></li>
           <li><%= link_to('Equipments', equipments_path)%></li>
-          <li><a href="#">Schedule</a></li>
+          <li><%= link_to('Schedule',create_schedule_path)%></li>
           <li><a href="#">About</a></li>
 
           <% if user_signed_in? %>

@@ -60,18 +60,14 @@ class LessonsController < ApplicationController
 
     week_day = ['mon','tue','wed','thu','fri','sat','sun']
     for day in 0..6
-
-      if(params[:chk_schedule][week_day[day].to_sym].to_i==1)
+      if(!params[:chk_schedule[day]].present?)
         first_key = week_day[day]+'(4i)'
         second_key = week_day[day]+'(5i)'
         start_time[day]= params[:start_time][first_key].to_i* 60+ params[:start_time][second_key].to_i
         end_time[day]  = params[:end_time][first_key].to_i* 60+ params[:end_time][second_key].to_i
-      else
-        start_time[day]= 0
-        end_time[day]  = 0
       end
-      #start_time[day] = params[:chk_schedule][week_day[day]]
     end
+
 
     @lesson.warm_up = warm_up.to_json
     @lesson.conditioning = conditioning.to_json
@@ -201,5 +197,13 @@ class LessonsController < ApplicationController
     @schedule_duration = Hash.new
     @schedule_duration[12] = "12 Weeks"
     @schedule_duration[13] = "13 Weeks"
+
+    @timeslot_intervals = Hash.new
+    @timeslot_intervals[15] = "15 Minutes"
+    @timeslot_intervals[20] = "20 Minutes"
+    @timeslot_intervals[30] = "30 Minutes"
+    @timeslot_intervals[45] = "45 Minutes"
+    @timeslot_intervals[60] = "1 Hour"
+
   end
 end

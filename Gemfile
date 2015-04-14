@@ -20,7 +20,7 @@ gem 'jquery-rails'
 gem 'turbolinks'
 
 gem 'devise'
-gem 'activeadmin', github: 'activeadmin'
+gem 'activeadmin', github: 'gregbell/active_admin'
 
 #bootstrap gem
 
@@ -43,4 +43,7 @@ gem 'spring',        group: :development
 
 # Use debugger
 # gem 'debugger', group: [:development, :test]
-gem 'jquery-form-validator-rails'
+
+gem 'gga4r'
+
+gem 'rails_12factor', group: :production

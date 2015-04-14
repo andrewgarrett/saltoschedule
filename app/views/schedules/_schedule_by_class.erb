@@ -1,0 +1,97 @@
+<!--
+<p>
+  Equipments:<%= $equipments_array %>
+</p>
+
+<p>
+  Classes:<%= $classes_array.inspect %>
+</p>
+<p>
+  start : <%= $schedule_start_time %>
+</p>
+<p>
+  end: <%= $schedule_end_time %>
+</p>
+<p>
+  Time Slots(* <%=@interval%>min):<%= $time_slots %>
+</p>
+
+<p>
+  <%= @best_fit.inspect %>
+</p>
+<p>
+  <%= @best_fit_by_equipment.inspect %>
+</p>
+-->
+<p>Time Slot Interval
+<%= select_tag('timeslot_interval', options_from_collection_for_select(@timeslot_intervals, :first, :last, @interval)) %>
+</p>
+<p>
+ <%= link_to 'Create Schedule Again',create_schedule_path(:interval => @interval) %>
+
+</p>
+<% if @conflict != 1 %>
+      <h4>Not perfect, Conflict(s) are there
+    <%= @best_fit.number_of_conflicts %></h4>
+<% end %>
+<h2>By Equipment</h2>
+<table>
+  <thead>
+  <tr>
+    <th>&nbsp;</th>
+    <% $equipments_array.each do |v| %>
+        <th><%= v %></th>
+    <% end %>
+  </tr>
+  </thead>
+  <tbody>
+  <% i=0 %>
+  <% @best_fit_by_equipment.each_slice($equipments_array.size()) do |fits| %>
+      <tr>
+        <td>
+          <%= format("%02d:%02d", ($time_slots[i]*@interval+$schedule_start_time)/60, ($time_slots[i]*@interval+$schedule_start_time)%60)%>
+
+        </td>
+        <% fits.each do |v| %>
+            <td class="lesson">
+                <% if v.each do  |i| %>
+                    <span style="background: <%= @background_color[i.to_i % 9] %>"><%= $classes_array[i.to_i] %></span>
+                <% end.empty? %>
+                    N/A
+                <% end %>
+            </td>
+        <% end %>
+      </tr>
+      <% i+=1 %>
+  <% end %>
+  </tbody>
+
+</table>
+
+<h2>By Class</h2>
+<table>
+  <thead>
+    <tr>
+      <th>&nbsp;</th>
+      <% $classes_array.each do |v| %>
+        <th><%= v %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <% i=0 %>
+    <% @best_fit.values.each_slice($classes_array.size()) do |fits| %>
+        <tr>
+          <td >
+            <%= format("%02d:%02d", ($time_slots[i]*@interval+$schedule_start_time)/60, ($time_slots[i]*@interval+$schedule_start_time)%60)%>
+
+          </td>
+          <% fits.each do |v| %>
+            <td class="equipment" style="background: <%= @background_color[v.to_i % 9] %>" ><%= $equipments_array[v.to_i] %></td>
+          <% end %>
+        </tr>
+        <% i+=1 %>
+    <% end %>
+  </tbody>
+
+</table>

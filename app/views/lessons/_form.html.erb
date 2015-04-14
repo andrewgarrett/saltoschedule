@@ -19,11 +19,11 @@
 
   <div class="form-controls">
     <%= f.label :title %><br>
-    <%= f.text_field :title,  'data-validation'=>'required' %>
+    <%= f.text_field :title %>
   </div>
   <div class="form-controls">
      <%= f.label :instructor %><br>
-     <%= f.text_field :instructor, 'data-validation'=>'required' %>
+     <%= f.text_field :instructor %>
   </div>
   <div class="form-controls">
     <%
@@ -46,11 +46,11 @@
                     if(!start_time.nil?)
                         checked= (start_time[index.to_s].to_i > 0)
                     else
-                        checked = true
+                        checked = false
                     end
                    key = 'chk_schedule['+day+']'
             %>
-            <th class="week_day"><%=check_box_tag key,1,checked, class:'chk_schedule' %><label><%=  day %></label></th>
+            <th><%=check_box_tag key,1,checked, class:'chk_schedule' %></th>
             <%
                index = index + 1
                end
@@ -70,7 +70,7 @@
                         minute = 0
                     end
                  %><td>
-                  <%= time_select 'start_time', day, {:ampm => true, :minute_step=>15, :start_hour=>9, :end_hour =>21, :default => Time.now.change(:hour => hour, :min=> minute)}, 'data-validation'=>'startendtime'%>
+                  <%= time_select 'start_time', day, {:ampm => true, :minute_step=>15, :start_hour=>9, :end_hour =>21, :default => Time.now.change(:hour => hour, :min=> minute)}%>
                   </td>
               <%
                  index = index + 1
@@ -87,11 +87,11 @@
                      hour    = end_time[index.to_s].to_i / 60
                      minute  = end_time[index.to_s].to_i % 60
                    else
-                     hour = 12
+                     hour = 9
                      minute = 0
                    end
               %><td>
-                  <%= time_select 'end_time', day, {:ampm => true, :minute_step=>15, :start_hour=>9, :end_hour =>21, :default => Time.now.change(:hour => hour, :min=> minute)} , 'data-validation'=>'startendtime'%>
+                  <%= time_select 'end_time', day, {:ampm => true, :minute_step=>15, :start_hour=>9, :end_hour =>21, :default => Time.now.change(:hour => hour, :min=> minute)}%>
                   </td>
               <%
                  index = index + 1
@@ -181,7 +181,7 @@
 
                #for i in 0...events.length
                for i in 0..total_events-1
-                if(!events.nil? && !events[i].nil?)
+                if(!events.nil?)
                     def_equipment       = events[i]['equipment']
                     def_total_duration  = events[i]['total_use_duration']
                     def_min_duration    = events[i]['min_use_duration']
@@ -221,77 +221,14 @@
       </table>
     </div>
     <div class="form-controls">
-        <input type="button" name="create_schedule" id="btn_create_schedule" value="Create Schedule"/>
+        <%=link_to 'Create Schedule',create_schedule_path(:interval => 30), :id=>'create_schedule' %>
+      <br/>
       <%= select_tag('schedule_duration', options_from_collection_for_select(@schedule_duration, :first, :last, '2')) %>
+      <br/>
+      <p>Time Slot Interval</p>
+      <%= select_tag('timeslot_interval_form', options_from_collection_for_select(@timeslot_intervals, :first, :last, '30')) %>
     </div>
   <div class="actions">
-    <% if(@lesson.persisted?) %>
-         <%= f.submit 'Update Class' %>
-    <% else %>
-       <%= f.submit 'Add Class' %>
-    <% end     %>
-
+    <%= f.submit %>
   </div>
 <% end %>
-<script>
-    /* important to locate this script AFTER the closing form element, so form object is loaded in DOM before setup is called */
-    // Add validator
-    $.formUtils.addValidator({
-        name : 'startendtime',
-        validatorFunction : function(value, $el, config, language, $form) {
-            //get start, end
-            //
-            if($($el).is(':hidden'))
-                return true;
-
-
-            //parse ids
-            var array = $el.attr('id').split('_');
-
-            //retrive start hour and minute
-            array[0]='start';
-            array[3]='4i';
-
-            var start_hour_id = array.join("_");
-            var start_hour=$('#'+start_hour_id).val();
-
-            array[3]='5i';
-            var start_minute_id = array.join("_");
-            var start_minute = $('#'+start_minute_id).val();
-
-
-            //now end hour and minute
-
-            array[0] = 'end';
-            array[3] = '4i';
-            var end_hour_id = array.join("_");
-            var end_hour = $('#'+end_hour_id).val();
-
-            array[3] = '5i';
-            var end_minute_id = array.join("_");
-            var end_minute = $('#'+end_minute_id).val();
-
-
-        /*    console.log('updated');
-            console.log(start_hour+":"+start_minute);
-            console.log(end_hour +":"+ end_minute);*/
-            if(isNaN(start_minute))
-                start_minute = 0;
-            if(isNaN(end_minute))
-                end_minute = 0 ;
-           /* console.log(start_hour*60+start_minute);
-            console.log(end_hour*60+end_minute);
-            console.log(start_hour*60+start_minute<end_hour*60+end_minute);*/
-            if (eval(start_hour*60+start_minute)<eval(end_hour*60+end_minute))
-                return true;
-            else
-                return false;
-
-        },
-        errorMessage : 'You can\'t take end time before start time',
-        errorMessageKey: 'badTime'
-    });
-
-    $.validate({
-    });
-</script>
