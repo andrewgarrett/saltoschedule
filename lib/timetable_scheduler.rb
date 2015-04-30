@@ -73,6 +73,14 @@ class TimetableScheduler
       @population = selection(@population)
       new_gen = @population.map { |chromosome| chromosome.dup }
 
+
+      if !@multi_modal
+        @population += recombination(new_gen) + mutation(new_gen)
+      else
+        @population = deterministic_crowding(@population)
+        @population = mutation(@population)
+      end
+
       #cut1
       @population = selection(@population)
 
@@ -95,6 +103,8 @@ class TimetableScheduler
     @logger.debug "Shuffled!" if @logger
     new_children = []
     new_generation.each_slice(2) do |chromosome1, chromosome2|
+      next if chromosome2.nil?
+      @logger.debug "Recombining" if @logger
       new_children << chromosome1.recombine(chromosome2)
     end
     new_children.flatten!(1) if @multi_recombination

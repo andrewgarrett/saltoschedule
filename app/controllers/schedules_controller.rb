@@ -6,6 +6,22 @@ require 'scheduler_population'
 
 class SchedulesController < ApplicationController
   def index
+    #time slots
+    @timeslot_intervals = Hash.new
+    @timeslot_intervals[15] = "15 Minutes"
+    @timeslot_intervals[20] = "20 Minutes"
+    @timeslot_intervals[30] = "30 Minutes"
+    @timeslot_intervals[45] = "45 Minutes"
+    @timeslot_intervals[60] = "1 Hour"
+
+    @schedule_duration = Hash.new
+    @schedule_duration[12] = "12 Weeks"
+    @schedule_duration[13] = "13 Weeks"
+
+    @week_days = [[0,'Mon'],[1, 'Tue'],[2, 'Wed'],[3,'Thu'],[4,'Fri'],[5,'Sat'],[6, 'Sun']]
+  end
+
+  def arrange_schedule
     @x = 3
     @lessons = Lesson.all
     @equipments = Equipment.all
@@ -20,11 +36,13 @@ class SchedulesController < ApplicationController
     @interval = params[:interval].to_i
     @interval = 30 if @interval==0
 
+    @week_days = [[0,'Mon'],[1, 'Tue'],[2, 'Wed'],[3,'Thu'],[4,'Fri'],[5,'Sat'],[6, 'Sun']]
+    @week_day = params[:week_day].to_i
+
     #do real scheduling
-    do_timetable_scheduling (@interval)
+    do_timetable_scheduling @interval, @week_day
     @background_color = ['red','blue','green','black','indigo','purple','brown','grey','deepskyblue']
   end
-
   #original population
   def create_population_with_fit_all_1s(s_long = 10, num = 10)
     population = []
@@ -91,7 +109,8 @@ class SchedulesController < ApplicationController
     p ga.best_fit[0]
   end
   #new timetable scheduling
-  def do_timetable_scheduling (interval = 30)
+  def do_timetable_scheduling (interval = 30, day_of_week=0)
+    p day_of_week
     #second get equipments info
     $equipments_array = []
     @equipments.each_with_index do |equipment, p|
@@ -115,22 +134,25 @@ class SchedulesController < ApplicationController
     week_day = ['mon','tue','wed','thu','fri','sat','sun']
     @lessons.each_with_index do |lesson, index|
       #by default we deal with monday time and assumes it's same for all other days of the week
-      week_day.each_with_index do |day, index|
-        unless JSON.parse(lesson.start_time)[index.to_s]==0
-          all_start_time << JSON.parse(lesson.start_time)[index.to_s]
+
+      #fo the deliverable we check and end time
+
+      #week_day.each_with_index do |day, index|
+        unless JSON.parse(lesson.start_time)[day_of_week.to_s]==0
+          p JSON.parse(lesson.start_time)[day_of_week.to_s]
+          all_start_time << JSON.parse(lesson.start_time)[day_of_week.to_s]
         end
-        unless JSON.parse(lesson.end_time)[index.to_s]==0
-        all_end_time << JSON.parse(lesson.end_time)[index.to_s]
+        unless JSON.parse(lesson.end_time)[day_of_week.to_s]==0
+          all_end_time << JSON.parse(lesson.end_time)[day_of_week.to_s]
         end
-      end
+      #end
 
     end
 
     p all_start_time
     p all_end_time
 
-    #$start_time = all_start_time.min() / 30
-    #$end_time = all_end_time.max() / 30
+   #time offest
     $schedule_start_time = all_start_time.min()
     $schedule_end_time = all_end_time.max()
     $start_time = 0
@@ -203,10 +225,19 @@ class SchedulesController < ApplicationController
     puts 'best fit by equipment'
     $time_slots.size().times do |t|
       $equipments_array.size().times do |e|
+
+        #fetch one row
         range = @best_fit.values[t*$classes_array.size(), $classes_array.size()]
+        #retrieve class variable..
         classes = range.each_index.select{|i| @best_fit.values[i+t*$classes_array.size()] == e}
         if classes
+          #check if in class start and end time
+          #p @lessons[classes].start_time
+          p classes
+
           @best_fit_by_equipment << classes
+
+          #@best_fit_by_equipment << '-1'
         else
           @best_fit_by_equipment << '-1'
         end

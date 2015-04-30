@@ -8,4 +8,5 @@ Rails.application.routes.draw do
   root 'welcome#index'
   resources :equipments, :lessons
   get 'schedule',:to=>'schedules#index', :as=>:create_schedule
+  post 'schedule/create',:to=>'schedules#arrange_schedule', :as=>:arrange_schedule
 end

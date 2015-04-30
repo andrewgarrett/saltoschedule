@@ -23,6 +23,13 @@
   <%= @best_fit_by_equipment.inspect %>
 </p>
 -->
+<p>
+  Time Slots(* <%=@interval%>mins )
+</p>
+<p>
+  Day of Week: <%=@week_days[@week_day] %>
+</p>
+<!--
 <p>Time Slot Interval
 <%= select_tag('timeslot_interval', options_from_collection_for_select(@timeslot_intervals, :first, :last, @interval)) %>
 </p>
@@ -30,6 +37,7 @@
  <%= link_to 'Create Schedule Again',create_schedule_path(:interval => @interval) %>
 
 </p>
+-->
 <% if @conflict != 1 %>
       <h4>Not perfect, Conflict(s) are there
     <%= @best_fit.number_of_conflicts %></h4>
@@ -50,12 +58,26 @@
       <tr>
         <td>
           <%= format("%02d:%02d", ($time_slots[i]*@interval+$schedule_start_time)/60, ($time_slots[i]*@interval+$schedule_start_time)%60)%>
-
+          <%
+             cur_time = $time_slots[i]*@interval+$schedule_start_time
+          %>
         </td>
         <% fits.each do |v| %>
             <td class="lesson">
                 <% if v.each do  |i| %>
-                    <span style="background: <%= @background_color[i.to_i % 9] %>"><%= $classes_array[i.to_i] %></span>
+
+
+                    <!-- check  time relations... -->
+                    <%
+                        start_time = JSON.parse(@lessons[i].start_time)[@week_day.to_s]
+                        end_time = JSON.parse(@lessons[i].end_time)[@week_day.to_s]
+                        if ((start_time > cur_time) || (cur_time >= end_time))
+
+                    %>
+                       &nbsp;
+                    <% else %>
+                      <span style="background: <%= @background_color[i.to_i % 9] %>"><%= $classes_array[i.to_i] %></span>
+                    <% end %>
                 <% end.empty? %>
                     N/A
                 <% end %>
@@ -84,14 +106,25 @@
         <tr>
           <td >
             <%= format("%02d:%02d", ($time_slots[i]*@interval+$schedule_start_time)/60, ($time_slots[i]*@interval+$schedule_start_time)%60)%>
+            <%
+               cur_time = $time_slots[i]*@interval+$schedule_start_time
+            %>
 
           </td>
-          <% fits.each do |v| %>
-            <td class="equipment" style="background: <%= @background_color[v.to_i % 9] %>" ><%= $equipments_array[v.to_i] %></td>
+          <% fits.each_with_index do |v, i| %>
+              <%
+                 start_time = JSON.parse(@lessons[i].start_time)[@week_day.to_s]
+                 end_time = JSON.parse(@lessons[i].end_time)[@week_day.to_s]
+                 if(start_time<=cur_time && cur_time<=end_time)
+              %>
+                <td class="equipment" style="background: <%= @background_color[v.to_i % 9] %>" ><%= $equipments_array[v.to_i] %></td>
+              <% else %>
+                <td class="equipment" >&nbsp;</td>
+              <% end %>
           <% end %>
         </tr>
         <% i+=1 %>
     <% end %>
   </tbody>
-
 </table>
+<%= link_to "Back", :back %>

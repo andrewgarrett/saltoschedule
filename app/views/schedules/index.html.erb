@@ -1,2 +1,15 @@
 <h1>Best Schedule</h1>
-<%= render 'schedule_by_class' %>
+<%= form_for(:schedule, as: :post,url:arrange_schedule_path) do |f| %>
+    <div class="form-controls">
+      <p>Weeks No.</p>
+      <%= select_tag('schedule_duration', options_from_collection_for_select(@schedule_duration, :first, :last, '2')) %>
+      <p>Day of Week</p>
+      <%= select_tag('week_day', options_from_collection_for_select(@week_days, :first, :last, '2')) %>
+      <br/>
+      <p>Time Slot Interval</p>
+      <%= select_tag('interval', options_from_collection_for_select(@timeslot_intervals, :first, :last, '30')) %>
+    </div>
+    <div class="actions">
+     <input type="submit" value="Generate Schedule">
+    </div>
+<% end %>

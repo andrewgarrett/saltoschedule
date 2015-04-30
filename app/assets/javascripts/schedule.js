@@ -3,6 +3,3 @@
         var interval = jQuery(this).val();
         location.href = '/schedule?interval=' + interval;
     });
-
-
-

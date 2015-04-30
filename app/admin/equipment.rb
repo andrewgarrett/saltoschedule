@@ -19,13 +19,13 @@ ActiveAdmin.register Equipment do
     actions
   end
 
-  #edit form
+      #edit form
 
-  form do |f|
-    f.inputs  "Equipment Details" do
-      f.input :user_id, as: :select, collection: User.all.collect{|user| [user.email, user.id]}, value: :user_id
-      f.input :name
-      f.input :max_class
+      form do |f|
+        f.inputs  "Equipment Details" do
+          f.input :user_id, as: :select, collection: User.all.collect{|user| [user.email, user.id]}, value: :user_id
+          f.input :name
+          f.input :max_class
       f.input :desc
     end
     f.actions
